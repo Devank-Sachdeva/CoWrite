@@ -1,8 +1,11 @@
+"use client"
+
 import { cn } from "@/lib/utils";
 import { ChevronsLeft, MenuIcon, MenuSquareIcon, Sidebar } from "lucide-react"
 import { usePathname } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react"
 import { useMediaQuery } from "usehooks-ts";
+import { UserItem } from "./useritem";
 
 export const SideBar = () => {
     const pathname = usePathname();
@@ -70,13 +73,13 @@ export const SideBar = () => {
     useEffect(() => {
         if (isMobile) collapse();
         else resetWidth();
-    }, [isMobile, resetWidth]);
+    }, [isMobile]);
 
     useEffect(() => {
         if (isMobile) collapse();
 
     }, [isMobile, pathname])
-    
+
     return (
         <>
         <aside 
@@ -96,8 +99,8 @@ export const SideBar = () => {
                     )} >
                     <ChevronsLeft className="h-6 w-6" />
             </div>
-            <div>
-                <p>Action Items</p>
+            <div >
+                <UserItem />
             </div>
             <div className="mt-4">
                 <p>Documents</p>

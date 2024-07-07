@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 import { ModeToggle } from "../mode-toggle";
 import { useConvexAuth } from "convex/react";
-import { SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
+import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { Button } from "../ui/button";
 import { Spinner } from "../spinner";
 import Link from "next/link";

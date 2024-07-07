@@ -5,8 +5,7 @@ import { Button } from "../ui/button";
 import { ArrowRight } from "lucide-react"; 
 import { Spinner } from "../spinner";
 import Link from "next/link";
-import { Sign } from "crypto";
-import { SignInButton } from "@clerk/clerk-react";
+import { SignInButton } from "@clerk/nextjs";
 
 export const Heading = () => {
     const { isAuthenticated, isLoading } = useConvexAuth(); 
