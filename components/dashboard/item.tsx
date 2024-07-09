@@ -2,12 +2,29 @@
 
 import { Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
-import { ChevronDown, ChevronRight, LucideIcon, PlusIcon } from "lucide-react";
+import {
+    ArchiveIcon,
+    ChevronDown,
+    ChevronRight,
+    LucideIcon,
+    MoreHorizontal,
+    PlusIcon,
+    Trash,
+} from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { archive } from "@/convex/documents";
+import {
+    DropdownMenu,
+    DropdownMenuItem,
+    DropdownMenuContent,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { useUser } from "@clerk/nextjs";
 
 interface ItemProps {
     id?: Id<"document">;
@@ -33,13 +50,16 @@ export const Item = ({
     label,
     icon: Icon,
 }: ItemProps) => {
-
     const create = useMutation(api.documents.create);
+    const archive = useMutation(api.documents.archive)
     const router = useRouter();
-    const handleExpand = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const { user } = useUser();
+    const handleExpand = (
+        event: React.MouseEvent<HTMLDivElement, MouseEvent>
+    ) => {
         event.stopPropagation();
         onExpand?.();
-    }
+    };
     const onCreate = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         event.stopPropagation();
         if (!id) return;
@@ -47,15 +67,29 @@ export const Item = ({
         const promise = create({
             title: "Untitled Document",
             parentDocumentId: id,
-        }).then((doc)=> {
+        }).then((doc) => {
             if (!expanded) onExpand?.();
             else router.push(`/documents/${doc}`);
-        })
+        });
 
         toast.promise(promise, {
             loading: "Creating a new Note...",
             success: "New Note created",
-            error: "Failed to create note"
+            error: "Failed to create note",
+        });
+    };
+
+    const onArchive = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        event.stopPropagation();
+
+        if (!id) return;
+        const promise = archive({ id })
+
+        toast.promise(promise, {
+            loading: "Moving to Trash",
+            success: "Note moved to Trash",
+            error: "Failed to Archive Note"
+        
         })
     }
     const ChevronIcon = expanded ? ChevronDown : ChevronRight;
@@ -94,24 +128,58 @@ export const Item = ({
                 </kbd>
             )}
             {!!id && (
-                <div className="ml-auto flex items-center gap-x-2" role="button" onClick={onCreate}>
-                    <div className="opacity-0 group-hover:opacity-100 h-full rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600">
+                <div
+                    className="ml-auto flex items-center gap-x-2"
+                    role="button"
+                >
+                    <DropdownMenu>
+                        <DropdownMenuTrigger
+                            onClick={(e) => e.stopPropagation()}
+                            asChild
+                        >
+                            <div
+                                role="button"
+                                className="opacity-0 group-hover:opacity-100 h-full ml-auto rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
+                            >
+                                <MoreHorizontal className="h-4 w-4" />
+                            </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            className="w-60"
+                            align="start"
+                            side="right"
+                            forceMount
+                        >
+                            <DropdownMenuItem onClick={onArchive}>
+                                <Trash className="h-4 w-4 mr-2" />
+                                Delete
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <div className="text-xs text-muted-foreground p-2">
+                                Last Edited by {user?.fullName}
+                            </div>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <div
+                        className="opacity-0 group-hover:opacity-100 h-full rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
+                        onClick={onCreate}
+                    >
                         <PlusIcon className="h-4 w-4" />
                     </div>
-
                 </div>
-
             )}
         </div>
     );
 };
 
-Item.Skeleton = function ItemSkeleton({ level } : {level?: number}){
+Item.Skeleton = function ItemSkeleton({ level }: { level?: number }) {
     return (
-        <div style={{paddingLeft: level ? (level*12)+12 : 12} }
-        className="flex gap-x-2 py-[3px]">
+        <div
+            style={{ paddingLeft: level ? level * 12 + 12 : 12 }}
+            className="flex gap-x-2 py-[3px]"
+        >
             <Skeleton className="h-4 w-4" />
             <Skeleton className="h-4 w-[30%]" />
         </div>
-    )
-}
+    );
+};
