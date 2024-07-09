@@ -1,12 +1,29 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
+import { api } from "@/convex/_generated/api";
+import { mutation } from "@/convex/_generated/server";
 import { useClerk, useUser } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
 import { PlusCircle } from "lucide-react";
 import Image from "next/image";
+import { toast, Toaster } from "sonner";
 
 const DashBoardPage = () => {
     const { user } = useUser();
+    const create = useMutation(api.documents.create);
+
+    const onCreateHandler = () => {
+        const promise = create({
+            title: "Untitled Note",
+        })
+
+        toast.promise(promise, {
+            loading: "Creating Note...",
+            success: "New Note Created!",
+            error: "Failed to create Note"
+        })
+    }
 
     return (
         <div className="h-full flex flex-col items-center justify-center space-y-4">
@@ -27,7 +44,7 @@ const DashBoardPage = () => {
             <h2>
                 Welcome to {user?.firstName}&apos;s CoWrite 
             </h2>
-            <Button>
+            <Button onClick={onCreateHandler}>
                 <PlusCircle className="h-4 w-4 mr-2" />
                 Create a Note
             </Button>

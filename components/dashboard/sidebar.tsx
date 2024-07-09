@@ -1,15 +1,22 @@
 "use client"
 
 import { cn } from "@/lib/utils";
-import { ChevronsLeft, MenuIcon, MenuSquareIcon, Sidebar } from "lucide-react"
+import { ChevronsLeft, DotIcon, MenuIcon, MenuSquareIcon, PlusCircle, Search, Settings, Sidebar } from "lucide-react"
 import { usePathname } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react"
 import { useMediaQuery } from "usehooks-ts";
 import { UserItem } from "./useritem";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Item } from "./item";
+import { toast } from "sonner";
+import { DocumentList } from "./documentlist";
 
 export const SideBar = () => {
     const pathname = usePathname();
     const isMobile = useMediaQuery("(max-width: 768px)");
+
+    const create = useMutation(api.documents.create);
 
     const isResizingRef = useRef(false);
     const sideBarRef = useRef<ElementRef<"aside">>(null);
@@ -80,6 +87,15 @@ export const SideBar = () => {
 
     }, [isMobile, pathname])
 
+    const handleCreate = () => {
+        const promise = create({title: "Untitled Note"});
+        toast.promise(promise, {
+            loading: "Creating Note...",
+            success: "New Note Created!",
+            error: "Failed to create Note"
+        });
+    }
+
     return (
         <>
         <aside 
@@ -101,9 +117,21 @@ export const SideBar = () => {
             </div>
             <div >
                 <UserItem />
+                <Item 
+                    label="Search"
+                    icon={Search}
+                    isSearch
+                    onClick={()=> {}}
+                />
+                <Item 
+                    label="Settings"
+                    icon={Settings}
+                    onClick={()=> {}}
+                />
+                <Item onClick={handleCreate} label="New Page" icon={PlusCircle} />
             </div>
             <div className="mt-4">
-                <p>Documents</p>
+                <DocumentList />
             </div>
                 <div className="opacity-0 group-hover/sidebar:opacity-100 transition cursor-ew-resize absolute h-full w-1 bg-primary/10 right-0 top-0" onMouseDown={handleMouseDown} onClick={resetWidth} />
 
