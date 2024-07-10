@@ -70,7 +70,7 @@ export const TrashBox = () => {
                 <Search className="h-4 w-4" />
                 <Input
                     value={search}
-                    onChange = {(e) => setSearch(e.target.value)}
+                    onChange={(e) => setSearch(e.target.value)}
                     className="h-7 px-2 focus-visible:ring-transparent bg-secondary"
                     placeholder="Filter by Page Title"
                 />
@@ -84,34 +84,29 @@ export const TrashBox = () => {
                         className="text-sm rounded-sm w-full hover:bg-primary/5 flex items-center text-primary justify-between"
                         key={doc._id}
                         role="button"
-                        onClick={() => onClick(doc._id)} 
-                    > 
-                        <span className="truncate pl-2">
-                            {doc.title}
-                        </span>
+                        onClick={() => onClick(doc._id)}
+                    >
+                        <span className="truncate pl-2">{doc.title}</span>
                         <div className="flex">
                             <div
-                                onClick={(e)=> onRestore(e, doc._id)}
+                                onClick={(e) => onRestore(e, doc._id)}
                                 role="button"
-                                className="rounded-sm p-2 hover:bg-neutral-200"
+                                className="rounded-sm p-2 hover:bg-neutral-200 dark:hover:bg-neutral-800"
                             >
-                                <Undo className="h-4 w-4 text-muted-foreground"
-                                />
+                                <Undo className="h-4 w-4 text-muted-foreground" />
                             </div>
-                            <ConfirmModal onConfirm={()=> onDelete(doc._id)}>
-                                <div 
-                                    role="button" 
-                                    className="rounded-sm p-2 hover:bg-neutral-200"
+                            <ConfirmModal onConfirm={() => onDelete(doc._id)}>
+                                <div
+                                    role="button"
+                                    className="rounded-sm p-2 hover:bg-neutral-200 dark:hover:bg-neutral-800"
                                 >
                                     <Trash className="h-4 w-4 text-muted-foreground" />
                                 </div>
                             </ConfirmModal>
                         </div>
-                        
                     </div>
                 ))}
             </div>
-            
         </div>
-    )
+    );
 }

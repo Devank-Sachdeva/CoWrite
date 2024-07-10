@@ -22,18 +22,22 @@ import { DocumentList } from "./documentlist";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { TrashBox } from "./trashbox";
 import { useSearch } from "@/hooks/use-search";
+import { useSettings } from "@/hooks/use-settings";
 
 export const SideBar = () => {
     const pathname = usePathname();
     const isMobile = useMediaQuery("(max-width: 768px)");
-
+    
     const create = useMutation(api.documents.create);
-
+    
     const isResizingRef = useRef(false);
     const sideBarRef = useRef<ElementRef<"aside">>(null);
     const navBarRef = useRef<ElementRef<"div">>(null);
     const [isReseting, setIsReseting] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(isMobile);
+    
+    const onSearch = useSearch();
+    const onSettings = useSettings();
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -61,7 +65,6 @@ export const SideBar = () => {
         }
     };
     
-    const onSearch = useSearch();
 
     const handleMouseUp = () => {
         isResizingRef.current = false;
@@ -139,7 +142,7 @@ export const SideBar = () => {
                 <div>
                     <UserItem />
                     <Item label="Search" icon={Search} isSearch onClick={onSearch.onOpen} />
-                    <Item label="Settings" icon={Settings} />
+                    <Item label="Settings" icon={Settings} onClick={onSettings.onOpen} />
                     <Item
                         onClick={handleCreate}
                         label="New Page"
