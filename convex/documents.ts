@@ -123,7 +123,7 @@ export const restore = mutation({
     args: {
         id: v.id("document"),
     },
-    handler: async (ctx,args) => {
+    handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("Unauthenticated");
         const userId = identity.subject;
@@ -134,7 +134,12 @@ export const restore = mutation({
         if (existingDoc.userId !== userId) throw new Error("Unauthorized");
 
         const recursiveRestore = async (docId: Id<"document">) => {
-            const children = await ctx.db.query("document").withIndex("by_parent", (q) => q.eq("userId",userId).eq("parentDocumentId",docId)).collect();
+            const children = await ctx.db
+                .query("document")
+                .withIndex("by_parent", (q) =>
+                    q.eq("userId", userId).eq("parentDocumentId", docId)
+                )
+                .collect();
 
             for (const child of children) {
                 await ctx.db.patch(child._id, {
@@ -142,29 +147,29 @@ export const restore = mutation({
                 });
                 await recursiveRestore(child._id);
             }
-        }
+        };
 
         const options: Partial<Doc<"document">> = {
-            isArchived: false
-        }
+            isArchived: false,
+        };
 
         if (existingDoc.parentDocumentId) {
             const parent = await ctx.db.get(existingDoc.parentDocumentId);
 
-            if (parent?.isArchived){
+            if (parent?.isArchived) {
                 options.parentDocumentId = undefined;
             }
         }
 
-        const doc = await ctx.db.patch(args.id,options);
+        const doc = await ctx.db.patch(args.id, options);
         await recursiveRestore(args.id);
 
         return doc;
-    }
+    },
 });
 
 export const remove = mutation({
-    args:{
+    args: {
         id: v.id("document"),
     },
     handler: async (ctx, args) => {
@@ -179,16 +184,40 @@ export const remove = mutation({
         if (existingDoc.userId !== userId) throw new Error("Unauthorized");
 
         const recursiveRemove = async (docId: Id<"document">) => {
-            const children = await ctx.db.query("document").withIndex("by_parent", (q) => q.eq("userId", userId).eq("parentDocumentId", docId)).collect();
+            const children = await ctx.db
+                .query("document")
+                .withIndex("by_parent", (q) =>
+                    q.eq("userId", userId).eq("parentDocumentId", docId)
+                )
+                .collect();
 
-            for (const child of children){
+            for (const child of children) {
                 await ctx.db.delete(child._id);
                 await recursiveRemove(child._id);
             }
-        }
+        };
 
         const doc = await ctx.db.delete(args.id);
 
         return doc;
-    }
-})
+    },
+});
+
+export const getSearch = query({
+    handler: async (ctx) => {
+        const identity = await ctx.auth.getUserIdentity();
+
+        if (!identity) throw new Error("Unauthenticated");
+
+        const userId = identity.subject;
+
+        const documents = await ctx.db
+            .query("document")
+            .withIndex("by_user", (q) => q.eq("userId", userId))
+            .filter((q) => q.eq(q.field("isArchived"), false))
+            .order("desc")
+            .collect();
+
+        return documents;
+    },
+});

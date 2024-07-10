@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { DocumentList } from "./documentlist";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { TrashBox } from "./trashbox";
+import { useSearch } from "@/hooks/use-search";
 
 export const SideBar = () => {
     const pathname = usePathname();
@@ -59,6 +60,8 @@ export const SideBar = () => {
             );
         }
     };
+    
+    const onSearch = useSearch();
 
     const handleMouseUp = () => {
         isResizingRef.current = false;
@@ -135,7 +138,7 @@ export const SideBar = () => {
                 </div>
                 <div>
                     <UserItem />
-                    <Item label="Search" icon={Search} isSearch />
+                    <Item label="Search" icon={Search} isSearch onClick={onSearch.onOpen} />
                     <Item label="Settings" icon={Settings} />
                     <Item
                         onClick={handleCreate}

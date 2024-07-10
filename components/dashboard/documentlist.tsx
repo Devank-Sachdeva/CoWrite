@@ -67,7 +67,6 @@ export const DocumentList = ({
                 No Pages Inside
             </p>
             {documents.map((doc) => {
-                console.log(doc);
                 return <div key={doc._id}>
                     <Item
                         id={doc._id}
