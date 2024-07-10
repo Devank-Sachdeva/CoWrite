@@ -10,7 +10,7 @@ import {
     Settings,
     Trash,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { UserItem } from "./useritem";
@@ -23,10 +23,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { TrashBox } from "./trashbox";
 import { useSearch } from "@/hooks/use-search";
 import { useSettings } from "@/hooks/use-settings";
+import { NavBar } from "./navbar";
 
 export const SideBar = () => {
     const pathname = usePathname();
     const isMobile = useMediaQuery("(max-width: 768px)");
+    const params = useParams();
     
     const create = useMutation(api.documents.create);
     
@@ -141,8 +143,17 @@ export const SideBar = () => {
                 </div>
                 <div>
                     <UserItem />
-                    <Item label="Search" icon={Search} isSearch onClick={onSearch.onOpen} />
-                    <Item label="Settings" icon={Settings} onClick={onSettings.onOpen} />
+                    <Item
+                        label="Search"
+                        icon={Search}
+                        isSearch
+                        onClick={onSearch.onOpen}
+                    />
+                    <Item
+                        label="Settings"
+                        icon={Settings}
+                        onClick={onSettings.onOpen}
+                    />
                     <Item
                         onClick={handleCreate}
                         label="New Page"
@@ -160,7 +171,10 @@ export const SideBar = () => {
                         <PopoverTrigger className="w-full mt-4">
                             <Item label="Trash" icon={Trash} />
                         </PopoverTrigger>
-                        <PopoverContent  className="p-0 w-72" side={isMobile ? "bottom" : "right"}>
+                        <PopoverContent
+                            className="p-0 w-72"
+                            side={isMobile ? "bottom" : "right"}
+                        >
                             <TrashBox />
                         </PopoverContent>
                     </Popover>
@@ -179,15 +193,19 @@ export const SideBar = () => {
                     isMobile && "left-0 w-full"
                 )}
             >
-                <nav className="bg-transparent px-3 py-2 w-full">
-                    {isCollapsed && (
-                        <MenuSquareIcon
-                            className="h-6 w-6 text-muted-foreground "
-                            role="button"
-                            onClick={resetWidth}
-                        />
-                    )}
-                </nav>
+                {!!params.documentId ? (
+                    <NavBar isCollapsed={isCollapsed} onResetWidth={resetWidth} />
+                ) : (
+                    <nav className="bg-transparent px-3 py-2 w-full">
+                        {isCollapsed && (
+                            <MenuSquareIcon
+                                className="h-6 w-6 text-muted-foreground "
+                                role="button"
+                                onClick={resetWidth}
+                            />
+                        )}
+                    </nav>
+                )}
             </div>
         </>
     );

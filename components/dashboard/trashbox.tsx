@@ -51,7 +51,7 @@ export const TrashBox = () => {
         })
 
         if (params.docuemntId === docuemntId) {
-            router.push("/dashboard")
+            router.push("/documents")
         }
     }
 

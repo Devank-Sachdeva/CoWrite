@@ -36,7 +36,7 @@ export const NavBar = () => {
                 {isAuthenticated && !isLoading && (
                     <>
                         <Button variant={"ghost"} size={"sm"} asChild>
-                            <Link href={"/dashboard"}>Dashboard</Link>
+                            <Link href={"/documents"}>Dashboard</Link>
                         </Button>
                         <UserButton />
                     </>
