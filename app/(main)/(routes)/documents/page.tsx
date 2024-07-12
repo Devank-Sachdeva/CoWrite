@@ -7,16 +7,18 @@ import { useClerk, useUser } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import { PlusCircle } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 
 const DashBoardPage = () => {
     const { user } = useUser();
+    const router = useRouter();
     const create = useMutation(api.documents.create);
 
     const onCreateHandler = () => {
         const promise = create({
-            title: "Untitled Note",
-        })
+            title: "Untitled",
+        }).then((res) => router.push(`/documents/${res}`));
 
         toast.promise(promise, {
             loading: "Creating Note...",

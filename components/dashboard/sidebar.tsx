@@ -10,7 +10,7 @@ import {
     Settings,
     Trash,
 } from "lucide-react";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { UserItem } from "./useritem";
@@ -29,15 +29,16 @@ export const SideBar = () => {
     const pathname = usePathname();
     const isMobile = useMediaQuery("(max-width: 768px)");
     const params = useParams();
-    
+    const router = useRouter();
+
     const create = useMutation(api.documents.create);
-    
+
     const isResizingRef = useRef(false);
     const sideBarRef = useRef<ElementRef<"aside">>(null);
     const navBarRef = useRef<ElementRef<"div">>(null);
     const [isReseting, setIsReseting] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(isMobile);
-    
+
     const onSearch = useSearch();
     const onSettings = useSettings();
 
@@ -66,7 +67,6 @@ export const SideBar = () => {
             );
         }
     };
-    
 
     const handleMouseUp = () => {
         isResizingRef.current = false;
@@ -113,7 +113,9 @@ export const SideBar = () => {
     }, [isMobile, pathname]);
 
     const handleCreate = () => {
-        const promise = create({ title: "Untitled Note" });
+        const promise = create({ title: "Untitled" }).then((res) =>
+            router.push(`/documents/${res}`)
+        );
         toast.promise(promise, {
             loading: "Creating Note...",
             success: "New Note Created!",
@@ -194,7 +196,10 @@ export const SideBar = () => {
                 )}
             >
                 {!!params.documentId ? (
-                    <NavBar isCollapsed={isCollapsed} onResetWidth={resetWidth} />
+                    <NavBar
+                        isCollapsed={isCollapsed}
+                        onResetWidth={resetWidth}
+                    />
                 ) : (
                     <nav className="bg-transparent px-3 py-2 w-full">
                         {isCollapsed && (
