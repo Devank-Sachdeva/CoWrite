@@ -16,6 +16,8 @@ interface CoverProps {
     url?: string;
     preview?: boolean;
 }
+
+//TODO: on mobile toolbar should open on click instead of hover
 export const Cover = ({ url, preview }: CoverProps) => {
     const coverImage = useCoverImage();
     const removeCover = useMutation(api.documents.removeCoverImage);
