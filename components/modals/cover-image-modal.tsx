@@ -24,12 +24,13 @@ export const CoverImageModal = () => {
             setFile(file);
             setIsSubmitting(true);
 
-            const { url } = await edgestore.publicFiles.upload({ file });
-
+            const { url } = await edgestore.publicFiles.upload({file, options: {
+                replaceTargetUrl: coverImage.url
+            }})
             await update({
                 id: params.documentId as Id<"document">,
                 coverImage: url,
-            });
+            }); 
             onClose();
         }
     };
